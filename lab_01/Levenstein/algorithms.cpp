@@ -25,7 +25,7 @@ int LevensteinMatrix(string s1, string s2)
             matrix[i][j] = minimum(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost);
         }
     }
-    printMatrix(row_count, column_count, matrix);
+    //printMatrix(row_count, column_count, matrix);
     int result = matrix[s1.length()][s2.length()];
     clearMatrix(matrix, row_count);
     return result;
@@ -57,7 +57,7 @@ int DamerauLevinsteinMatrix(string s1, string s2)
             }
         }
     }
-    printMatrix(row_count, column_count, matrix);
+    //printMatrix(row_count, column_count, matrix);
     int result = matrix[s1.length()][s2.length()];
     clearMatrix(matrix, row_count);
     return result;
