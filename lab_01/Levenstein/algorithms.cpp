@@ -42,7 +42,7 @@ int DamerauLevinsteinMatrix(string s1, string s2)
     {
         for (int j = 1; j < column_count + 1; j++)
         {
-            if (s1[i - 1] == s2[j - 1])
+            if (s1[i] == s2[j])
             {
                 cost = 0;
             }

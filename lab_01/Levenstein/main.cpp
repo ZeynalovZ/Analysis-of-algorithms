@@ -83,7 +83,7 @@ void DamerauLevensteinMTesting(string *strings)
     // first test
     {
         cout << " Test1:..." << endl;
-        int expected_result = 5;
+        int expected_result = 4;
         int result = DamerauLevinsteinMatrix(strings[0], strings[1]);
         if (expected_result == result)
         {
