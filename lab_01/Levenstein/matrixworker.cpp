@@ -33,6 +33,21 @@ int minimum(int d1, int d2, int d3)
     return -1;
 }
 
+
+int minimum4(int d1, int d2, int d3, int d4)
+{
+    if (d1 <= d2 && d1 <= d3 && d1 <= d4)
+        return d1;
+    if (d2 <= d3 && d2 <= d1 && d2 <= d4)
+        return d2;
+    if (d3 <= d2 && d3 <= d1 && d3 <= d4)
+        return d3;
+    if (d4 <= d1 && d4 <= d2 && d4 <= d3)
+    {
+        return d4;
+    }
+    return -1;
+}
 // Заполняет первую строку и первый столбец
 // s1 and s2 - count of symbols in strings
 void fillBaseMatrix(int s1, int s2, int **matrix)

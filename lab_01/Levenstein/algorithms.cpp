@@ -53,7 +53,7 @@ int DamerauLevinsteinMatrix(string s1, string s2)
             matrix[i][j] = minimum(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost);
             if ((i > 1 && j > 1) && s1[i] == s2[j - 1] && s2[j] == s1[i - 1])
             {
-                matrix[i][j] = __min(matrix[i][j], matrix[i - 2][j - 2] + cost);
+                matrix[i][j] = min(matrix[i][j], matrix[i - 2][j - 2] + cost);
             }
         }
     }
@@ -75,6 +75,15 @@ int DamerauLevensteinRecursion(string s1, string s2)
         cost = 0;
     else
         cost = 1;
-    return minimum(DamerauLevensteinRecursion(s1.substr(0, s1.length() - 1), s2) + 1, DamerauLevensteinRecursion(s1, s2.substr(0, s2.length() - 1)) + 1,
-                   DamerauLevensteinRecursion(s1.substr(0, s1.length() - 1), s2.substr(0, s2.length() - 1)) + cost);
+    if (((s1.length() > 1 && s2.length() > 1) && s1[s1.length() - 1] == s2[s2.length() - 2]
+         && s2[s2.length() - 1] == s1[s1.length() - 2]))
+    {
+        return minimum4(DamerauLevensteinRecursion(s1.substr(0, s1.length() - 1), s2) + 1, DamerauLevensteinRecursion(s1, s2.substr(0, s2.length() - 1)) + 1,
+                       DamerauLevensteinRecursion(s1.substr(0, s1.length() - 1), s2.substr(0, s2.length() - 1)) + cost, DamerauLevensteinRecursion(s1.substr(0, s1.length() - 2), s2.substr(0, s2.length() - 2)) + cost);
+    }
+    else
+    {
+        return minimum(DamerauLevensteinRecursion(s1.substr(0, s1.length() - 1), s2) + 1, DamerauLevensteinRecursion(s1, s2.substr(0, s2.length() - 1)) + 1,
+                       DamerauLevensteinRecursion(s1.substr(0, s1.length() - 1), s2.substr(0, s2.length() - 1)) + cost);
+    }
 }
