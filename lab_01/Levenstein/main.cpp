@@ -235,7 +235,7 @@ int mainTest(void)
     DamerauLevensteinRTesting(strings);
     cout << "\n______________Testing Damerau Matrix_______________\n" << endl;
     DamerauLevensteinMTesting(strings);
-    cout << "\n______________Testing Levenstein_______________\n" << endl;
+    cout << "\n______________Testing Levenstein___________________\n" << endl;
     LevensteinMTesting(strings);
     return 0;
 }
