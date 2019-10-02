@@ -3,6 +3,13 @@
 #include <algorithm>
 #include "algorithms.h"
 using namespace std;
+unsigned long long tick(void)
+{
+    unsigned long long d;
+    __asm__ __volatile__ ("rdtsc" : "=A" (d) );
+
+    return d;
+}
 
 void DamerauLevensteinRTesting(string *strings)
 {
@@ -251,16 +258,43 @@ int main()
     cout << "Okeeeeey! Now input second string" << endl;
     cin >> str2;
     cout << "let's see the answer" << endl;
-    int distanceLM = LevensteinMatrix(str1, str2);
+    int distanceLM = 0;
+    unsigned int overal_int = 0;
+    for (int i = 0; i < 50; i++)
+    {
+        unsigned int tick1 = tick();
+        distanceLM = LevensteinMatrix(str1, str2);
+        unsigned int tick2 = tick();
+        overal_int += tick2 - tick1;
+    }
     cout << endl;
-    int distanceDLR = DamerauLevensteinRecursion(str1, str2);
+    cout << overal_int / 50 << " overal Levenstein" << endl;
+    int distanceDLR = 0;
+    overal_int = 0;
+    for (int i = 0; i < 50; i++)
+    {
+        unsigned int tick1 = tick();
+        distanceDLR = DamerauLevensteinRecursion(str1, str2);
+        unsigned int tick2 = tick();
+        overal_int += tick2 - tick1;
+    }
+    cout << overal_int / 50 << " overal Damerau Levenstein recurs" << endl;
     cout << endl;
-    int distanceDLM = DamerauLevinsteinMatrix(str1, str2);
+    overal_int = 0;
+    int distanceDLM = 0;
+    for (int i = 0; i < 50; i++)
+    {
+        unsigned int tick1 = tick();
+        distanceDLM = DamerauLevinsteinMatrix(str1, str2);
+        unsigned int tick2 = tick();
+        overal_int += tick2 - tick1;
+    }
+    cout << overal_int / 50 << " overal Damerau Levenstein" << endl;
     cout << endl;
     cout << "Result of Levenstein : " << distanceLM << endl;
     cout << "Result of Damerau_Levenstein_Matrix : " << distanceDLM << endl;
     cout << "Result Damerau_Levenstein_recurs : " << distanceDLR << endl;
     cout << "\n========================Testing======================" << endl;
-    mainTest();
+    //mainTest();
     return 0;
 }
