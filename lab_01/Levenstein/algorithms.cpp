@@ -10,7 +10,7 @@ int LevensteinMatrix(string s1, string s2)
     int column_count = s2.length();
     int **matrix = allocateMatrix(row_count, column_count);
     fillBaseMatrix(s1.length(), s2.length(), matrix);
-    int cost = 0;
+    int cost = 1;
     for (int i = 1; i < row_count + 1; i++)
     {
         for (int j = 1; j < column_count + 1; j++)
@@ -27,13 +27,13 @@ int LevensteinMatrix(string s1, string s2)
         }
     }
     //cout << "=== Levenstein Matrix ===" << endl;
-    printMatrix(row_count, column_count, matrix);
+    //printMatrix(row_count, column_count, matrix);
     int result = matrix[s1.length()][s2.length()];
     clearMatrix(matrix, row_count);
     return result;
 }
 
-int DamerauLevinsteinMatrix(string s1, string s2)
+int DamerauLevensteinMatrix(string s1, string s2)
 {
     int row_count = s1.length();
     int column_count = s2.length();
