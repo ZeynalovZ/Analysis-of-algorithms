@@ -119,34 +119,37 @@ int multiplicateMatrixVinograd(int ***result, int &rc, int &cc, int** src1, int 
     cc = cc2;
     int **tmpMtr = allocateMatrix(rc, cc);
     int *MulH = (int*)calloc(rc1, sizeof(int));
-    int *MulV = (int*)calloc(cc1, sizeof(int));
+    int *MulV = (int*)calloc(cc2, sizeof(int));
     for (int i = 0; i < rc1; i++)
     {
         for (int j = 0; j < rc2 / 2; j++)
         {
+
             MulH[i] = MulH[i] + src1[i][j * 2] * src1[i][2 * j + 1];
+            cout << MulH[i] << endl;
         }
     }
-    for (int i = 0; i < cc1; i++)
+    for (int i = 0; i < cc2; i++)
     {
         for (int j = 0; j < rc2 / 2; j++)
         {
             MulV[i] = MulV[i] + src2[j * 2][i] * src2[2 * j + 1][i];
+            cout << src2[j * 2][i] * src2[2 * j + 1][i] << endl;
         }
     }
-
     for (int i = 0; i < rc1; i++)
     {
         for (int j = 0; j < cc2; j++)
         {
-            tmpMtr[i][j] = -MulH[i] - MulV[j];
+            tmpMtr[i][j] = - (MulH[i] + MulV[j]);
+
             for (int k = 0; k < rc2 / 2; k++)
             {
                 tmpMtr[i][j] = tmpMtr[i][j] + (src1[i][2 * k] + src2[2 * k + 1][j]) * (src1[i][2 * k + 1] + src2[2 * k][j]);
             }
+
         }
     }
-
     if (rc2 % 2)
     {
         for (int i = 0; i < rc1; i++)
@@ -157,7 +160,6 @@ int multiplicateMatrixVinograd(int ***result, int &rc, int &cc, int** src1, int 
             }
         }
     }
-
     *result = tmpMtr;
 }
 
@@ -177,19 +179,22 @@ int optimizedMultiplication(int ***result, int &rc, int &cc, int** src1, int **s
     cc = cc2;
     int **tmpMtr = allocateMatrix(rc, cc);
     int *MulH = (int*)calloc(rc1, sizeof(int));
-    int *MulV = (int*)calloc(cc1, sizeof(int));
+    int *MulV = (int*)calloc(cc2, sizeof(int));
     for (int i = 0; i < rc1; i++)
     {
-        for (int j = 0; j < rc2_2; j++)
+        for (int j = 0; j < rc2 / 2; j++)
         {
-            MulH[i] +=  src1[i][j * 2] * src1[i][2 * j + 1];
+
+            MulH[i] = MulH[i] + src1[i][j * 2] * src1[i][2 * j + 1];
+            cout << MulH[i] << endl;
         }
     }
-    for (int i = 0; i < cc1; i++)
+    for (int i = 0; i < cc2; i++)
     {
-        for (int j = 0; j < rc2_2; j++)
+        for (int j = 0; j < rc2 / 2; j++)
         {
-            MulV[i] += src2[j * 2][i] * src2[2 * j + 1][i];
+            MulV[i] = MulV[i] + src2[j * 2][i] * src2[2 * j + 1][i];
+            cout << src2[j * 2][i] * src2[2 * j + 1][i] << endl;
         }
     }
     int N = rc2 - 1;
@@ -206,11 +211,12 @@ int optimizedMultiplication(int ***result, int &rc, int &cc, int** src1, int **s
         }
     }
 
-    if (flag)
+
+    for (int i = 0; i < rc1; i++)
     {
-        for (int i = 0; i < rc1; i++)
+        for (int j = 0; j < cc2; j++)
         {
-            for (int j = 0; j < cc2; j++)
+            if (flag)
             {
                 tmpMtr[i][j] += src1[i][N] * src2[N][j];
             }
