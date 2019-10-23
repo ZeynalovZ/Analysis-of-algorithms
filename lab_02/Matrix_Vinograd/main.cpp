@@ -84,7 +84,7 @@ int createMatrix(int ***matrix, int rowCount, int columnCount)
     }
     return code_error;
 }
-#pragma optimize("", off)
+//#pragma optimize("", off)
 int multiplicateMatrix(int ***result, int &rc, int &cc, int** src1, int **src2, int rc1, int cc1, int rc2, int cc2)
 {
     if (cc1 != rc2)
@@ -104,13 +104,13 @@ int multiplicateMatrix(int ***result, int &rc, int &cc, int** src1, int **src2, 
         {
             for (int k = 0; k < rc1; k++)
             {
-                tmpMtr[i][j] += src1[i][k] * src2[k][j];
+                tmpMtr[i][j] = tmpMtr[i][j] + src1[i][k] * src2[k][j];
             }
         }
     }
     *result = tmpMtr;
 }
-#pragma optimize("", off)
+//#pragma optimize("", off)
 int multiplicateMatrixVinograd(int ***result, int &rc, int &cc, int** src1, int **src2, int rc1, int cc1, int rc2, int cc2)
 {
     if (cc1 != rc2)
@@ -162,13 +162,13 @@ int multiplicateMatrixVinograd(int ***result, int &rc, int &cc, int** src1, int 
         {
             for (int j = 0; j < cc2; j++)
             {
-                tmpMtr[i][j] += src1[i][rc2 - 1] * src2[rc2 - 1][j];
+                tmpMtr[i][j] = tmpMtr[i][j] + src1[i][rc2 - 1] * src2[rc2 - 1][j];
             }
         }
     }
     *result = tmpMtr;
 }
-#pragma optimize("", off)
+//#pragma optimize("", off)
 int optimizedMultiplication(int ***result, int &rc, int &cc, int** src1, int **src2, int rc1, int cc1, int rc2, int cc2)
 {
 
@@ -190,17 +190,14 @@ int optimizedMultiplication(int ***result, int &rc, int &cc, int** src1, int **s
     {
         for (int j = 0; j < rc2_2; j++)
         {
-
-            MulH[i] = MulH[i] + src1[i][j * 2] * src1[i][2 * j + 1];
-            //cout << MulH[i] << endl;
+            MulH[i] -= src1[i][j * 2] * src1[i][2 * j + 1];
         }
     }
     for (int i = 0; i < cc2; i++)
     {
         for (int j = 0; j < rc2_2; j++)
         {
-            MulV[i] = MulV[i] + src2[j * 2][i] * src2[2 * j + 1][i];
-            //cout << src2[j * 2][i] * src2[2 * j + 1][i] << endl;
+            MulV[i] -= src2[j * 2][i] * src2[2 * j + 1][i];
         }
     }
     int N = rc2 - 1;
@@ -209,10 +206,10 @@ int optimizedMultiplication(int ***result, int &rc, int &cc, int** src1, int **s
     {
         for (int j = 0; j < cc2; j++)
         {
-            tmpMtr[i][j] = -MulH[i] - MulV[j];
+            tmpMtr[i][j] = MulH[i] + MulV[j];
             for (int k = 0; k < rc2_2; k++)
             {
-                tmpMtr[i][j] = tmpMtr[i][j] + (src1[i][2 * k] + src2[2 * k + 1][j]) * (src1[i][2 * k + 1] + src2[2 * k][j]);
+                tmpMtr[i][j] += (src1[i][k * 2] + src2[2 * k + 1][j]) * (src1[i][2 * k + 1] + src2[2 * k][j]);
             }
         }
     }
@@ -233,12 +230,11 @@ int optimizedMultiplication(int ***result, int &rc, int &cc, int** src1, int **s
 
 int main()
 {
-    int start = 100;
-    int end = 900;
+    int start = 101;
+    int end = 901;
     int step = 100;
     int rep = 10;
 
-    unsigned long long int tBegin = 0, tEnd = 0;
     double tSum = 0;
     int **matrix1 = NULL;
     int **matrix2 = NULL;
@@ -246,14 +242,6 @@ int main()
     int res_r = 0, res_c = 0;
     int code_error = OK;
 
-
-    //printMatrix(matrix1, rowCount1, columnCount1);
-    //printMatrix(matrix2, rowCount2, columnCount2);
-    //multiplicateMatrix(&result, res_r, res_c, matrix1, matrix2, rowCount1, columnCount1, rowCount2, columnCount2);
-    //multiplicateMatrixVinograd(&result, res_r, res_c, matrix1, matrix2, rowCount1, columnCount1, rowCount2, columnCount2);
-    //optimizedMultiplication(&result, res_r, res_c, matrix1, matrix2, rowCount1, columnCount1, rowCount2, columnCount2);
-    //cout << endl;
-    //printMatrix(result, res_r, res_c);
     for (int i = start; i < end; i += step)
     {
         cout << endl;
@@ -302,7 +290,6 @@ int main()
                 }
                 tSum /= rep;
                 cout << "time Matrix Vinograd Optimized is " << tSum << endl;
-
             }
         }
     }

@@ -1,0 +1,109 @@
+\documentclass[a4paper, 14pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{pgfplots}
+\usepackage{url}
+% подключаем hyperref (для ссылок внутри  pdf)
+\usepackage[unicode, pdftex]{hyperref}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\lstset{tabsize=2,
+    breaklines,
+    columns=fullflexible,
+    flexiblecolumns,
+    numbers=left,
+    keepspaces=true,
+    numberstyle={\footnotesize},
+    extendedchars=\true
+}
+\lstdefinelanguage{MyC}{
+  language=C++,
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  morecomment=[n]{/**}{*/},
+  commentstyle=\color{blue}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]",
+  showstringspaces=false,
+  morecomment=[l][\color{gray}]{//},
+  keepspaces=true,
+  escapechar=\%,
+  %texcl=⟨true|false⟩
+}
+%\usepackage[russian,russian,english]{babel}
+\frenchspacing                    % ставим пробелы в соответствии с французским стилем
+\DeclareGraphicsExtensions{.pdf,.png,.jpg,.svg}
+\usepackage{titlesec}
+\usepackage[russian]{babel}
+\usepackage{algpseudocode}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage[linesnumbered,boxed]{algorithm2e}
+\DeclareCaptionFont{white}{\color{white}} %% это сделает текст заголовка белым
+%% код ниже нарисует серую рамочку вокруг заголовка кода.
+
+\linespread{1}
+
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white} 
+
+\begin{document}
+	\begin{titlepage}
+		\begin{center}
+			\begin{LARGE}
+				Отчет по лабораторной работе №2\\
+					по курсу "Анализ алгоритмов"\\
+					по теме "Алгоритм умножения матриц \\
+					Коперсента-Винограда"
+			\end{LARGE}
+		
+			\begin{Large}
+				\vspace{10cm}
+				Студент: Зейналов З. Г. ИУ7-51\\
+					Преподаватель: Волкова Л.Л.\\
+				
+				\vspace{5cm}2019 г.				   
+			\end{Large}
+			
+		\end{center}
+		 
+	\end{titlepage}
+
+\tableofcontents
+	
+\newpage
+\section*{Введение}
+\addcontentsline{toc}{section}{Введение}
+\hspace{1cm} Целью данной лабораторной работы является исследование существующих алгоритмов умножение матриц и трудоемкости их вычислений.\\* Выберем следующую модель вычислений:\\
+\begin{enumerate}
+\item Трудоемкость базовых операций: \\ Операции +, -, *, /, $\div$, <, <=, >=, >, ==, !=, [ ], +=, -= - имеют стоимость 1 
+\item Трудоемкость условия перехода  - 0, при этом расчет условия оцениванеим:\\
+\lstset{language = C++}
+\begin{lstlisting}
+ if ( N % 2 == 1)
+{
+	// Тело1
+}
+else
+{
+	// Тело2
+}
+\end{lstlisting}
+f__if  =  f_условия +
+\left\{ 
+\begin{eqnarray}
+f_т1 , при нечетном N  \\
+f_т2 , при четном
+\end{eqnarray}}
+\item 
+\end{enumerate}
+
+
+
+
+
+\end{document}
