@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <time.h>
 using namespace std;
 
 class arraySort
@@ -14,18 +16,20 @@ public:
     arraySort(size_t size)
     {
         arraySize = size;
-        // arrayCreation
-        for (size_t i = 0; i < arraySize; i++)
-        {
-            Array.push_back(rand() % 100 + 1);
-        }
     }
 
     bool isEmpty();
 
     void printArray();
 
+    void fillArray(size_t count);
+
+    void fillIncreasing(size_t count);
+    void fillDecreasing(size_t count);
+
     void insertionSort();
+
+    void getArrayFromUser();
 
     void quickSort(size_t first, size_t last);
 
@@ -61,6 +65,36 @@ void arraySort::printArray()
     }
 }
 
+void arraySort::fillArray(size_t count)
+{
+    arraySize = count;
+    // arrayCreation
+    for (size_t i = 0; i < count; i++)
+    {
+        Array.push_back(rand() % 100 + 1);
+    }
+}
+
+void arraySort::fillIncreasing(size_t count)
+{
+    arraySize = count;
+    // arrayCreation
+    for (size_t i = 0; i < count; i++)
+    {
+        Array.push_back(i);
+    }
+}
+
+void arraySort::fillDecreasing(size_t count)
+{
+    arraySize = count;
+    // arrayCreation
+    for (size_t i = count; i > 0; i--)
+    {
+        Array.push_back(i);
+    }
+}
+
 void arraySort::insertionSort()
 {
     for (size_t i = 0; i < this->arraySize - 1; i++)
@@ -78,34 +112,42 @@ void arraySort::insertionSort()
     }
 }
 
+void arraySort::getArrayFromUser()
+{
+    cout << "Enter nums: " << endl;
+    for (size_t i = 0; i < this->arraySize; i++)
+    {
+        int a;
+        cin >> a;
+        this->Array.push_back(a);
+    }
+}
+
 void arraySort::quickSort(size_t first, size_t last)
 {
-    if (first > this->arraySize || last > this->arraySize)
+    if (first + 1 < last) // wtfd
     {
-        return;
-    }
-    int mid, temp;
-    size_t f = first;
-    size_t l = last;
-    mid = this->Array[(f + l) / 2];
-    do
-    {
-        while (this->Array[f] < mid) f++;
-        while (this->Array[l] > mid) l--;
-        if (f <= l)
+        int mid, tmp;
+        size_t f = first, l = last;
+        mid = this->Array[(f + l) / 2]; //вычисление опорного элемента
+        do
         {
-            temp = this->Array[f];
-            this->Array[f] = this->Array[l];
-            this->Array[l] = temp;
-            f++;
-            l--;
-        }
+            while (this->Array[f] < mid && f <= last)
+                f++;
+            while (this->Array[l] > mid && l >= first)
+                l--;
+            if (f <= l) //перестановка элементов
+            {
+                tmp = this->Array[f];
+                this->Array[f] = this->Array[l];
+                this->Array[l] = tmp;
+                f++;
+                l--;
+            }
+        } while (f <= l);
+        if (first < l) quickSort(first, l);
+        if (f < last) quickSort(f, last);
     }
-    while (f < l);
-
-    if (first < l) this->quickSort(first, l);
-    if (f < last) this->quickSort(f, last);
-
 }
 
 void arraySort::GnomeSort(size_t i, size_t j)
@@ -136,33 +178,107 @@ void arraySort::GnomeSort(size_t i, size_t j)
     }
 }
 
+unsigned long long tick(void)
+{
+    unsigned long long d;
+    __asm__ __volatile__ ("rdtsc" : "=A" (d) );
+
+    return d;
+}
 
 void time()
 {
-    ;
+    double sum = 0;
+    int repeat = 50;
+    int begin = 100;
+    int step = 100;
+    int last = 1000;
+    for (int j = begin; j <= last; j += step)
+    {
+        cout << "==============for size " << j << " ==========" <<endl;
+        {
+            arraySort array, arrayTmp;
+            array.fillDecreasing(j);
+            arrayTmp.arraySize = array.arraySize;
+            arrayTmp.Array = array.Array;
+            for (int i = 0; i < repeat; i++)
+            {
+                const auto start = tick();
+                array.insertionSort();
+                const auto end = tick();
+                const auto res = end - start;
+                sum += res;
+                array.Array = arrayTmp.Array;
+            }
+            sum = sum / repeat;
+            cout << "===overall insertion is " << sum << endl;
+        }
+        sum = 0;
+        {
+            arraySort array, arrayTmp;
+            array.fillDecreasing(j);
+            arrayTmp.arraySize = array.arraySize;
+            arrayTmp.Array = array.Array;
+            for (int i = 0; i < repeat; i++)
+            {
+                const auto start = tick();
+                array.quickSort(0, array.arraySize);
+                const auto end = tick();
+                const auto res = end - start;
+                sum += res;
+                array.Array = arrayTmp.Array;
+            }
+            sum = sum / repeat;
+            cout << "===overall quick is " << sum << endl;
+        }
+        sum = 0;
+        {
+            arraySort array, arrayTmp;
+            array.fillDecreasing(j);
+            arrayTmp.arraySize = array.arraySize;
+            arrayTmp.Array = array.Array;
+            for (int i = 0; i < repeat; i++)
+            {
+                const auto start = tick();
+                array.GnomeSort(1, 2);
+                const auto end = tick();
+                const auto res = end - start;
+                sum += res;
+                array.Array = arrayTmp.Array;
+            }
+            sum = sum / repeat;
+            cout << "===overall gnome is " << sum << endl;
+        }
+        cout << endl;
+    }
+
+
+}
+
+void getData()
+{
+    arraySort array(5), array1(5), array2(5);
+    array.getArrayFromUser();
+    array1.Array = array.Array;
+    array2.Array = array.Array;
+
+    cout << "=====Insertion sort=====" << endl;
+    array.insertionSort();
+    array.printArray();
+
+    cout << "=====Quick sort=====" << endl;
+    array1.quickSort(0, array1.arraySize - 1);
+    array1.printArray();
+
+    cout << "=====Gnome sort=====" << endl;
+    array2.GnomeSort(1, 2);
+    array2.printArray();
+
 }
 
 int main()
 {
-    arraySort array(10);
-    cout << "=====Insertion sort=====" << endl;
-    array.printArray();
-    array.insertionSort();
-    cout << "after sort" << endl;
-    array.printArray();
-
-    arraySort array2(10);
-    cout << "=====Quick sort=====" << endl;
-    array2.printArray();
-    array2.quickSort(0, array.arraySize - 1);
-    cout << "after sort" << endl;
-    array2.printArray();
-
-    arraySort array3(10);
-    cout << "=====Gnome sort=====" << endl;
-    array3.printArray();
-    array3.GnomeSort(1, 2);
-    cout << "after sort" << endl;
-    array3.printArray();
+    time();
+    //getData();
     return 0;
 }
