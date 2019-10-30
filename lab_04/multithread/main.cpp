@@ -157,9 +157,9 @@ int optimizedMultiplication(int ***result, int &rc, int &cc, int** src1, int **s
     *result = tmpMtr;
 }
 
-void first_part(Matrix src1,int rc1, int rc2_2, std::vector<int> &MulH)
+void first_part(Matrix src1, int rows_begin ,int rc1, int rc2_2, std::vector<int> &MulH)
 {
-    for (int i = 0; i < rc1; i++)
+    for (int i = rows_begin; i < rc1; i++)
     {
         for (int j = 0; j < rc2_2; j++)
         {
@@ -168,9 +168,9 @@ void first_part(Matrix src1,int rc1, int rc2_2, std::vector<int> &MulH)
     }
 }
 
-void second_part(Matrix src2, int cc2, int rc2_2, std::vector<int> &MulV)
+void second_part(Matrix src2, int columns_begin, int cc2, int rc2_2, std::vector<int> &MulV)
 {
-    for (int i = 0; i < cc2; i++)
+    for (int i = columns_begin; i < cc2; i++)
     {
         for (int j = 0; j < rc2_2; j++)
         {
@@ -179,7 +179,7 @@ void second_part(Matrix src2, int cc2, int rc2_2, std::vector<int> &MulV)
     }
 }
 
-void last_part(Matrix src1, Matrix src2, std::vector<int> &MulH, std::vector<int> &MulV, int rc1, int cc2, int rc2_2, Matrix &mtr_res)
+void last_part(Matrix src1, Matrix src2, std::vector<int> &MulH, std::vector<int> &MulV, int rows_begin, int rc1, int cc2, int rc2_2, Matrix &mtr_res)
 {
     int N = src2.rows_count - 1;
     bool flag =  src2.rows_count % 2;
@@ -213,6 +213,437 @@ void last_part(Matrix src1, Matrix src2, std::vector<int> &MulH, std::vector<int
     mtr_res.matrix = tmpMtr;
 }
 
+int multi16(Matrix mtr1, Matrix mtr2, Matrix &mtr_res)
+{
+    if (mtr1.columns_count != mtr2.rows_count)
+    {
+        return CANT_MULTIPLY;
+    }
+
+    int rows_count_first = mtr1.rows_count;
+    int rows_count_second_2 = mtr2.rows_count / 2;
+    int columns_count_second = mtr2.columns_count;
+
+    std::vector<int> MulH(mtr1.rows_count);
+    std::vector<int> MulV(mtr2.columns_count);
+
+    thread thread_1_1(first_part, mtr1, 0,
+                      rows_count_first / 8,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_1_2(first_part, mtr1, rows_count_first / 4,
+                      rows_count_first / 8 * 2,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_1_3(first_part, mtr1, rows_count_first / 8 * 2,
+                      rows_count_first / 8 * 3,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_1_4(first_part, mtr1, rows_count_first / 8 * 3,
+                      rows_count_first / 8 * 4,
+                      rows_count_second_2,
+                      ref(MulH));
+    thread thread_1_5(first_part, mtr1, rows_count_first / 8 * 4,
+                      rows_count_first / 8 * 5,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_1_6(first_part, mtr1, rows_count_first / 8 * 5,
+                      rows_count_first / 8 * 6,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_1_7(first_part, mtr1, rows_count_first / 8 * 6,
+                      rows_count_first / 8 * 7,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_1_8(first_part, mtr1, rows_count_first / 8 * 7,
+                      rows_count_first,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_2_1(second_part, mtr1, 0,
+                      columns_count_second / 8,
+                      rows_count_second_2,
+                      ref(MulV));
+
+    thread thread_2_2(second_part, mtr2, columns_count_second / 8,
+                      columns_count_second / 8 * 2,
+                      rows_count_second_2,
+                      ref(MulV));
+
+    thread thread_2_3(second_part, mtr2, columns_count_second / 8 * 2,
+                      columns_count_second / 8 * 3,
+                      rows_count_second_2,
+                      ref(MulV));
+
+    thread thread_2_4(second_part, mtr2, columns_count_second / 8 * 3,
+                      columns_count_second / 8 * 4,
+                      rows_count_second_2,
+                      ref(MulV));
+    thread thread_2_5(second_part, mtr1, columns_count_second / 8 * 4,
+                      columns_count_second / 8 * 5,
+                      rows_count_second_2,
+                      ref(MulV));
+
+    thread thread_2_6(second_part, mtr2, columns_count_second / 8 * 5,
+                      columns_count_second / 8 * 6,
+                      rows_count_second_2,
+                      ref(MulV));
+
+    thread thread_2_7(second_part, mtr2, columns_count_second / 8 * 6,
+                      columns_count_second / 8 * 7,
+                      rows_count_second_2,
+                      ref(MulV));
+
+    thread thread_2_8(second_part, mtr2, columns_count_second / 8 * 7,
+                      columns_count_second,
+                      rows_count_second_2,
+                      ref(MulV));
+
+
+
+    if (thread_1_1.joinable() && thread_2_1.joinable())
+    {
+        thread_1_1.join();
+        thread_1_2.join();
+        thread_1_3.join();
+        thread_1_4.join();
+        thread_1_5.join();
+        thread_1_6.join();
+        thread_1_7.join();
+        thread_1_8.join();
+        thread_2_1.join();
+        thread_2_2.join();
+        thread_2_3.join();
+        thread_2_4.join();
+        thread_2_5.join();
+        thread_2_6.join();
+        thread_2_7.join();
+        thread_2_8.join();
+    }
+
+    thread thread_3_1(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      0, rows_count_first / 16, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_2(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 16, rows_count_first / 16 * 2, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_3(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 16 * 2, rows_count_first / 16 * 3, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_4(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 16 * 3, rows_count_first / 16 * 4, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_5(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 16 * 4, rows_count_first / 16 * 5, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_6(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 16 * 5, rows_count_first / 16 * 6, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_7(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 16 * 6, rows_count_first / 16 * 7, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_8(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 16 * 7, rows_count_first / 16 * 8, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_9(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 16 * 8, rows_count_first / 16 * 9, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_10(last_part, mtr1,
+                       mtr2,
+                       ref(MulH),
+                       ref(MulV),
+                       rows_count_first / 16 * 9, rows_count_first / 16 * 10, columns_count_second, rows_count_second_2,
+                       ref(mtr_res));
+    thread thread_3_11(last_part, mtr1,
+                       mtr2,
+                       ref(MulH),
+                       ref(MulV),
+                       rows_count_first / 16 * 10, rows_count_first / 16 * 11, columns_count_second, rows_count_second_2,
+                       ref(mtr_res));
+    thread thread_3_12(last_part, mtr1,
+                       mtr2,
+                       ref(MulH),
+                       ref(MulV),
+                       rows_count_first / 16 * 11, rows_count_first / 16 * 12, columns_count_second, rows_count_second_2,
+                       ref(mtr_res));
+    thread thread_3_13(last_part, mtr1,
+                       mtr2,
+                       ref(MulH),
+                       ref(MulV),
+                       rows_count_first / 16 * 12, rows_count_first / 16 * 13, columns_count_second, rows_count_second_2,
+                       ref(mtr_res));
+    thread thread_3_14(last_part, mtr1,
+                       mtr2,
+                       ref(MulH),
+                       ref(MulV),
+                       rows_count_first / 16 * 13, rows_count_first / 16 * 14, columns_count_second, rows_count_second_2,
+                       ref(mtr_res));
+    thread thread_3_15(last_part, mtr1,
+                       mtr2,
+                       ref(MulH),
+                       ref(MulV),
+                       rows_count_first / 16 * 14, rows_count_first / 16 * 15, columns_count_second, rows_count_second_2,
+                       ref(mtr_res));
+    thread thread_3_16(last_part, mtr1,
+                       mtr2,
+                       ref(MulH),
+                       ref(MulV),
+                       rows_count_first / 16 * 15, rows_count_first, columns_count_second, rows_count_second_2,
+                       ref(mtr_res));
+
+    thread_3_1.join();
+    thread_3_2.join();
+    thread_3_3.join();
+    thread_3_4.join();
+    thread_3_5.join();
+    thread_3_6.join();
+    thread_3_7.join();
+    thread_3_8.join();
+    thread_3_9.join();
+    thread_3_10.join();
+    thread_3_11.join();
+    thread_3_12.join();
+    thread_3_13.join();
+    thread_3_14.join();
+    thread_3_15.join();
+    thread_3_16.join();
+}
+
+int multi8(Matrix mtr1, Matrix mtr2, Matrix &mtr_res)
+{
+    if (mtr1.columns_count != mtr2.rows_count)
+    {
+        return CANT_MULTIPLY;
+    }
+
+    int rows_count_first = mtr1.rows_count;
+    int rows_count_second_2 = mtr2.rows_count / 2;
+    int columns_count_second = mtr2.columns_count;
+
+    std::vector<int> MulH(mtr1.rows_count);
+    std::vector<int> MulV(mtr2.columns_count);
+
+    thread thread_1_1(first_part, mtr1, 0,
+                      rows_count_first / 4,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_1_2(first_part, mtr1, rows_count_first / 4,
+                      rows_count_first / 4 * 2,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_1_3(first_part, mtr1, rows_count_first / 4 * 2,
+                      rows_count_first / 4 * 3,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_1_4(first_part, mtr1, rows_count_first / 4 * 3,
+                      rows_count_first,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_2_1(second_part, mtr1, 0,
+                      columns_count_second / 4,
+                      rows_count_second_2,
+                      ref(MulV));
+
+    thread thread_2_2(second_part, mtr2, columns_count_second / 4,
+                      columns_count_second / 4 * 2,
+                      rows_count_second_2,
+                      ref(MulV));
+
+    thread thread_2_3(second_part, mtr2, columns_count_second / 4 * 2,
+                      columns_count_second / 4 * 3,
+                      rows_count_second_2,
+                      ref(MulV));
+
+    thread thread_2_4(second_part, mtr2, columns_count_second / 4 * 3,
+                      columns_count_second,
+                      rows_count_second_2,
+                      ref(MulV));
+
+
+
+    if (thread_1_1.joinable() && thread_2_1.joinable())
+    {
+        thread_1_1.join();
+        thread_1_2.join();
+        thread_1_3.join();
+        thread_1_4.join();
+        thread_2_1.join();
+        thread_2_2.join();
+        thread_2_3.join();
+        thread_2_4.join();
+    }
+
+    thread thread_3_1(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      0, rows_count_first / 8, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_2(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 8, rows_count_first / 8 * 2, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_3(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 8 * 2, rows_count_first / 8 * 3, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_4(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 8 * 3, rows_count_first / 8 * 4, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_5(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 8 * 4, rows_count_first / 8 * 5, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_6(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 8 * 5, rows_count_first / 8 * 6, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_7(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 8 * 6, rows_count_first / 8 * 7, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_8(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 8 * 7, rows_count_first, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+
+
+    thread_3_1.join();
+    thread_3_2.join();
+    thread_3_3.join();
+    thread_3_4.join();
+    thread_3_5.join();
+    thread_3_6.join();
+    thread_3_7.join();
+    thread_3_8.join();
+}
+
+int multi4(Matrix mtr1, Matrix mtr2, Matrix &mtr_res)
+{
+    if (mtr1.columns_count != mtr2.rows_count)
+    {
+        return CANT_MULTIPLY;
+    }
+
+    int rows_count_first = mtr1.rows_count;
+    int rows_count_second_2 = mtr2.rows_count / 2;
+    int columns_count_second = mtr2.columns_count;
+
+    std::vector<int> MulH(mtr1.rows_count);
+    std::vector<int> MulV(mtr2.columns_count);
+
+    thread thread_1_1(first_part, mtr1, 0,
+                      rows_count_first / 2,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_1_2(first_part, mtr1, rows_count_first / 2,
+                      rows_count_first,
+                      rows_count_second_2,
+                      ref(MulH));
+
+    thread thread_2_1(second_part, mtr1, 0,
+                      columns_count_second / 2,
+                      rows_count_second_2,
+                      ref(MulV));
+    thread thread_2_2(second_part, mtr2, columns_count_second / 2,
+                      columns_count_second,
+                      rows_count_second_2,
+                      ref(MulV));
+
+
+
+    if (thread_1_1.joinable() && thread_2_1.joinable())
+    {
+        thread_1_1.join();
+        thread_1_2.join();
+        thread_2_1.join();
+        thread_2_2.join();
+    }
+
+    thread thread_3_1(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      0, rows_count_first / 4, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_2(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 4, rows_count_first / 2, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_3(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 2, rows_count_first / 4 * 3, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_4(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV),
+                      rows_count_first / 4 * 3, rows_count_first, columns_count_second, rows_count_second_2,
+                      ref(mtr_res));
+    thread_3_1.join();
+    thread_3_2.join();
+    thread_3_3.join();
+    thread_3_4.join();
+
+}
+
 int multi2(Matrix mtr1, Matrix mtr2, Matrix &mtr_res)
 {
     if (mtr1.columns_count != mtr2.rows_count)
@@ -232,11 +663,11 @@ int multi2(Matrix mtr1, Matrix mtr2, Matrix &mtr_res)
     std::vector<int> MulH(mtr1.rows_count);
     std::vector<int> MulV(mtr2.columns_count);
 
-    thread thread_1_1(first_part, mtr1,
+    thread thread_1_1(first_part, mtr1, 0,
                       rows_count_first,
                       rows_count_second_2,
                       ref(MulH));
-    thread thread_2_1(second_part, mtr2,
+    thread thread_2_1(second_part, mtr2, 0,
                       columns_count_second,
                       rows_count_second_2,
                       ref(MulV));
@@ -250,52 +681,134 @@ int multi2(Matrix mtr1, Matrix mtr2, Matrix &mtr_res)
     thread thread_3_1(last_part, mtr1,
                       mtr2,
                       ref(MulH),
-                      ref(MulV),
+                      ref(MulV), 0,
+                      rows_count_first / 2,
+                      columns_count_second,
+                      rows_count_second_2,
+                      ref(mtr_res));
+    thread thread_3_2(last_part, mtr1,
+                      mtr2,
+                      ref(MulH),
+                      ref(MulV), rows_count_first / 2,
                       rows_count_first,
                       columns_count_second,
                       rows_count_second_2,
                       ref(mtr_res));
     thread_3_1.join();
-    /*
-     * thread thread_1_1(first_part, mtr1, ref(m1),
-                      rows_count_first, ref(m1rc),
-                      rows_count_second_2, ref(m2rc_2),
-                      ref(MulH), ref(row));
-    thread thread_2_1(second_part, mtr2, ref(m2),
-                      columns_count_second, ref(m2cc),
-                      rows_count_second_2, ref(m2rc_2),
-                      MulV, ref(column));
-
-    if (thread_1_1.joinable() && thread_2_1.joinable())
-    {
-        thread_1_1.join();
-        thread_2_1.join();
-    }
-    thread thread_3_1(last_part, mtr1, ref(m1),
-                      mtr2, ref(mtr2),
-                      MulH, (row),
-                      MulV, (row),
-                      rows_count_first, (m1rc),
-                      columns_count_second, (m2cc),
-                      rows_count_second_2, (m2rc_2),
-                      mtr_res, ref(m_out));
-    thread_3_1.join();
-    */
-    //printMatrix(mtr_res.matrix, mtr_res.rows_count, mtr_res.columns_count);
+    thread_3_2.join();
 }
 
 
 
 int main()
 {
-    Matrix mtr1(2, 2);
-    createMatrix(mtr1);
-    printMatrix(mtr1.matrix, mtr1.rows_count, mtr1.columns_count);
-    Matrix mtr2(2, 2);
-    createMatrix(mtr2);
-    printMatrix(mtr2.matrix, mtr2.rows_count, mtr2.columns_count);
-    Matrix mtr3;
-    multi2(mtr1, mtr2, mtr3);
-    printMatrix(mtr3.matrix, mtr3.rows_count, mtr3.columns_count);
+    //Matrix mtr1(2, 2);
+    //createMatrix(mtr1);
+    //printMatrix(mtr1.matrix, mtr1.rows_count, mtr1.columns_count);
+    //Matrix mtr2(2, 2);
+    //createMatrix(mtr2);
+    //printMatrix(mtr2.matrix, mtr2.rows_count, mtr2.columns_count);
+    //Matrix mtr3;
+    //multi16(mtr1, mtr2, mtr3);
+    //printMatrix(mtr3.matrix, mtr3.rows_count, mtr3.columns_count);
+    int start = 100;
+    int end = 500;
+    int step = 100;
+    int rep = 10;
+
+    unsigned long long tSum = 0;
+
+    for (int i = start; i <= end; i += step)
+    {
+        cout << endl;
+        cout << "===== for " << i << " size ========" << endl;
+        cout << endl;
+        {
+            Matrix mtr1(i, i);
+            createMatrix(mtr1);
+            //printMatrix(mtr1.matrix, mtr1.rows_count, mtr1.columns_count);
+            Matrix mtr2(i, i);
+            createMatrix(mtr2);
+            Matrix mtr3;
+            //printMatrix(mtr2.matrix, mtr2.rows_count, mtr2.columns_count);
+            tSum = 0;
+            for (int j = 0; j < rep; j++)
+            {
+                const unsigned long long start = tick();
+                multi2(mtr1, mtr2, mtr3);
+                const unsigned long long end = tick();
+                const unsigned long long res = (end - start);
+                tSum += res;
+            }
+            tSum /= rep;
+            cout << "multi2 " << tSum << endl;
+        }
+        tSum = 0;
+        {
+            Matrix mtr1(i, i);
+            createMatrix(mtr1);
+            //printMatrix(mtr1.matrix, mtr1.rows_count, mtr1.columns_count);
+            Matrix mtr2(i, i);
+            createMatrix(mtr2);
+            Matrix mtr3;
+            //printMatrix(mtr2.matrix, mtr2.rows_count, mtr2.columns_count);
+            tSum = 0;
+            for (int j = 0; j < rep; j++)
+            {
+                const unsigned long long start = tick();
+                multi4(mtr1, mtr2, mtr3);
+                const unsigned long long end = tick();
+                const unsigned long long res = (end - start);
+                tSum += res;
+            }
+            tSum /= rep;
+            cout << "multi4 " << tSum << endl;
+        }
+        tSum = 0;
+        {
+            Matrix mtr1(i, i);
+            createMatrix(mtr1);
+            //printMatrix(mtr1.matrix, mtr1.rows_count, mtr1.columns_count);
+            Matrix mtr2(i, i);
+            createMatrix(mtr2);
+            Matrix mtr3;
+            //printMatrix(mtr2.matrix, mtr2.rows_count, mtr2.columns_count);
+            tSum = 0;
+            for (int j = 0; j < rep; j++)
+            {
+                const unsigned long long start = tick();
+                multi8(mtr1, mtr2, mtr3);
+                const unsigned long long end = tick();
+                const unsigned long long res = (end - start);
+                tSum += res;
+            }
+            tSum /= rep;
+            cout << "multi8 " << tSum << endl;
+        }
+        tSum = 0;
+        {
+            Matrix mtr1(i, i);
+            createMatrix(mtr1);
+            //printMatrix(mtr1.matrix, mtr1.rows_count, mtr1.columns_count);
+            Matrix mtr2(i, i);
+            createMatrix(mtr2);
+            Matrix mtr3;
+            //printMatrix(mtr2.matrix, mtr2.rows_count, mtr2.columns_count);
+            tSum = 0;
+            for (int j = 0; j < rep; j++)
+            {
+                unsigned long long start = tick();
+                multi16(mtr1, mtr2, mtr3);
+                unsigned long long end = tick();
+                const unsigned long long res = (end - start);
+                tSum += res;
+            }
+            tSum /= rep;
+            cout << "multi16 " << tSum << endl;
+        }
+
+    }
+
+
     return 0;
 }
