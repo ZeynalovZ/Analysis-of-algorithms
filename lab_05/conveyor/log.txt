@@ -1,0 +1,30 @@
+21:37:11 line 1: start 0 item 1000 milliseconds
+21:37:12 line 1: end 0 item
+21:37:12 line 2: start 0 item 3000 milliseconds
+21:37:12 line 1: start 1 item 1000 milliseconds
+21:37:15 line 2: end 0 item 
+21:37:15 line 3: start 0 item 1500 milliseconds
+21:37:15 line 1: end 1 item
+21:37:15 line 1: start 2 item 1000 milliseconds
+21:37:15 line 2: start 1 item 3000 milliseconds
+21:37:17 line 3: end 0 item 
+21:37:18 line 2: end 1 item 
+21:37:18 line 3: start 1 item 1500 milliseconds
+21:37:18 line 1: end 2 item
+21:37:18 line 2: start 2 item 3000 milliseconds
+21:37:18 line 1: start 3 item 1000 milliseconds
+21:37:20 line 3: end 1 item 
+21:37:21 line 2: end 2 item 
+21:37:21 line 3: start 2 item 1500 milliseconds
+21:37:21 line 1: end 3 item
+21:37:21 line 2: start 3 item 3000 milliseconds
+21:37:21 line 1: start 4 item 1000 milliseconds
+21:37:23 line 3: end 2 item 
+21:37:24 line 3: start 3 item 1500 milliseconds
+21:37:24 line 2: end 3 item 
+21:37:24 line 1: end 4 item
+21:37:24 line 2: start 4 item 3000 milliseconds
+21:37:26 line 3: end 3 item 
+21:37:27 line 2: end 4 item 
+21:37:27 line 3: start 4 item 1500 milliseconds
+21:37:29 line 3: end 4 item 
